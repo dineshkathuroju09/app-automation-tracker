@@ -1,0 +1,34 @@
+name: Application Cloud Automation Engine
+
+on:
+  schedule:
+    # Executes automatically every 15 minutes 24/7 on the cloud
+    - cron: '*/15 * * * *'
+  workflow_dispatch:      
+    # Unlocks a manual 'Play' button in your dashboard for instant testing
+
+jobs:
+  execute-selenium-suite:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository Content
+        uses: actions/checkout@v4
+
+      - name: Deploy Java JDK 17 Virtual Environment
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Install Google Chrome Headless Binaries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Run Data Driven Selenium Framework Execution
+        env:
+          # Securely passes your encrypted secret keys directly to the Java System
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: mvn compile exec:java -Dexec.mainClass="com.automation.tracker.ApplicationTrackerFrmExcel"
