@@ -1,11 +1,8 @@
 name: Application Cloud Automation Engine
 
 on:
-  schedule:
-    # Executes automatically every 15 minutes 24/7 on the cloud
-    - cron: '*/1 * * * *'
-  workflow_dispatch:      
-    # Unlocks a manual 'Play' button in your dashboard for instant testing
+  workflow_dispatch: # Keeps manual buttons active
+  repository_dispatch: # Unlocks external API webhooks triggering capabilities
 
 jobs:
   execute-selenium-suite:
