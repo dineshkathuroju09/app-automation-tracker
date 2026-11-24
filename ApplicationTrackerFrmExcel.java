@@ -57,13 +57,25 @@ public class ApplicationTrackerFrmExcel {
                     boolean conditionMet = verifyPageCondition(target);
                     
                     if (conditionMet) {
-                        String alertMsg = String.format("🚨 *DATA-DRIVEN EXCEL ALERT!*\n\n" +
-                                        "🖥️ *Monitor:* %s\n" +
-                                        "📅 *Target Found:* %s\n" +
-                                        "🔗 *Direct Link:* %s", 
-                                target.pageLabel, target.expectedTargetCondition, target.webpageUrl);
-                                
-                        sendTelegramNotification(alertMsg);
+						/*
+						 * String alertMsg = String.format("🚨 *DATA-DRIVEN EXCEL ALERT!*\n\n" +
+						 * "🖥️ *Monitor:* %s\n" + "📅 *Target Found:* %s\n" + "🔗 *Direct Link:* %s",
+						 * target.pageLabel, target.expectedTargetCondition, target.webpageUrl);
+						 * 
+						 * sendTelegramNotification(alertMsg);
+						 */
+                    	String alertMsg = String.format(
+                    		    "🚨 <b>DATA-DRIVEN EXCEL ALERT!</b>\n\n" +
+                    		    "🖥️ <b>Monitor:</b> %s\n" +
+                    		    "📅 <b>Target Found:</b> %s\n" +
+                    		    "🔗 <b>Direct Link:</b> <a href=\"%s\">Book Tickets</a>",
+
+                    		    escapeHtml(target.pageLabel),
+                    		    escapeHtml(target.expectedTargetCondition),
+                    		    escapeHtml(target.webpageUrl)
+                    		);
+
+                    		sendTelegramNotification(alertMsg);
                     }
                 }
 
@@ -155,31 +167,65 @@ public class ApplicationTrackerFrmExcel {
         }
         return targetFoundOnPage;
     }
+    
 
-    private static void sendTelegramNotification(String message) {
-    	try {
-            // Use java.net.URI to safely encode newlines and emojis for the Telegram API
-            java.net.URI uri = new java.net.URI(
-                "https", 
-                "api.telegram.org", 
-                "/bot" + TELEGRAM_TOKEN + "/sendMessage", 
-                "chat_id=" + TELEGRAM_CHAT_ID + "&text=" + message + "&parse_mode=Markdown", 
-                null
-            );
+	private static void sendTelegramNotification(String message) {
 
-            java.net.URL url = uri.toURL();
-            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            
-            int responseCode = conn.getResponseCode();
-            if (responseCode == 200) {
-                System.out.println("[🎉 SUCCESS] Telegram message successfully pushed to your device!");
-            } else {
-                System.out.println("[❌ ERROR] Telegram rejected string payload. HTTP Code: " + responseCode);
-            }
-        } catch (Exception e) {
-            System.err.println("[-] Alert transmission routing failure: " + e.getMessage());
-        }
-    }
+		try {
+			String apiUrl = "https://api.telegram.org/bot" + TELEGRAM_TOKEN + "/sendMessage";
+
+			String payload = "chat_id=" + java.net.URLEncoder.encode(TELEGRAM_CHAT_ID, "UTF-8") + "&text="
+					+ java.net.URLEncoder.encode(message, "UTF-8") + "&parse_mode=HTML";
+
+			java.net.URI uri = java.net.URI.create(apiUrl);
+			java.net.URL url = uri.toURL();
+
+			java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+
+			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+			try (java.io.OutputStream os = conn.getOutputStream()) {
+				os.write(payload.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+			}
+
+			int responseCode = conn.getResponseCode();
+
+			java.io.InputStream stream = responseCode >= 200 && responseCode < 300 ? conn.getInputStream()
+					: conn.getErrorStream();
+
+			String response;
+
+			try (java.util.Scanner scanner = new java.util.Scanner(stream, "UTF-8").useDelimiter("\\A")) {
+				response = scanner.hasNext() ? scanner.next() : "";
+			}
+
+			if (responseCode == 200) {
+				System.out.println("[🎉 SUCCESS] Telegram message successfully pushed!");
+			} else {
+				System.err.println("[❌ ERROR] Telegram HTTP Code: " + responseCode);
+				System.err.println("[Telegram Response] " + response);
+			}
+
+			conn.disconnect();
+
+		} catch (Exception e) {
+			System.err.println("[-] Alert transmission failure: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	private static String escapeHtml(String text) {
+	    if (text == null) return "";
+
+	    return text.replace("&", "&amp;")
+	               .replace("<", "&lt;")
+	               .replace(">", "&gt;")
+	               .replace("\"", "&quot;");
+	}
+
+    
 }
 
