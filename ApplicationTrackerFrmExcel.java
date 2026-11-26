@@ -53,7 +53,10 @@ public class ApplicationTrackerFrmExcel {
 
                 // Step B: Loop through all rows captured out of the spreadsheet layout
                 for (TargetMonitor target : monitoringWatchlist) {
+                	System.out.println("                                                                       ");
+                	System.out.println("=======================================================================");
                     System.out.println("[*] Processing Suite: " + target.pageLabel);
+                    System.out.println("=======================================================================");
                     boolean conditionMet = verifyPageCondition(target);
                     
                     if (conditionMet) {
@@ -157,6 +160,10 @@ public class ApplicationTrackerFrmExcel {
                 	System.out.println("[+] Success! Visible elements count (" + size + ") met or exceeded target (" + targetCount + ")");
                   targetFoundOnPage = true;
               }
+                else {
+                	System.out.println("[+]  Did not match! Visible elements count (" + size + ") is less than target (" + targetCount + ")");
+                	System.out.println("The URL: " + driver.getCurrentUrl());
+                }
         }
         
             
