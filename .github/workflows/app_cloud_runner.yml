@@ -25,19 +25,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
-      # NEW DIAGNOSTIC STEP
-      - name: Compare Java source files
+      # ADD THE NEW CODE HERE
+      - name: Inspect Maven source file
         run: |
-          echo "ROOT LEVEL FILE:"
-          grep -n "NEW BUILD" ApplicationTrackerFrmExcel.java || true
+          echo "Workspace:"
+          pwd
 
-          echo "MAVEN SOURCE FILE:"
-          grep -n "NEW BUILD" src/main/java/com/automation/tracker/ApplicationTrackerFrmExcel.java || true
+          echo "Maven source contents:"
+          sed -n '30,48p' src/main/java/com/automation/tracker/ApplicationTrackerFrmExcel.java
 
-          echo "CHECKING SOURCE FILES:"
-          git status --short
+          echo "Search marker in tracked files:"
+          git grep -n "NEW BUILD" -- '*.java' || true
 
-      # EXISTING MAVEN EXECUTION
+          echo "Latest commit affecting Maven source:"
+          git log -1 --format='%h %ad %s' --date=iso -- src/main/java/com/automation/tracker/ApplicationTrackerFrmExcel.java
+
+          echo "Tracked source path:"
+          git ls-files --stage src/main/java/com/automation/tracker/ApplicationTrackerFrmExcel.java
+
+      # YOUR EXISTING MAVEN STEP REMAINS BELOW
       - name: Run Data Driven Selenium Framework Execution
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
