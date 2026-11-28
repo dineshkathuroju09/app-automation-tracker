@@ -39,6 +39,7 @@ public class ApplicationTrackerFrmExcel {
     }
 
     public static void main(String[] args) {
+    	System.out.println("NEW BUILD - TEST 001 - NOVEMBER 28");
         System.out.println("[*] Initialising Excel-Driven Automation Scraper...");
 
             // Step A: Dynamically read requirements directly from the spreadsheet file (Runs once per execution)
