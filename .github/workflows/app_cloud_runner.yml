@@ -26,18 +26,18 @@ jobs:
           sudo apt-get install -y google-chrome-stable
 
       # NEW DIAGNOSTIC STEP
-      - name: Locate Java source files
+      - name: Compare Java source files
         run: |
-          echo "Latest commit:"
-          git log -1 --oneline
+          echo "ROOT LEVEL FILE:"
+          grep -n "NEW BUILD" ApplicationTrackerFrmExcel.java || true
 
-          echo "Searching for Java files:"
-          find . -name "*.java"
+          echo "MAVEN SOURCE FILE:"
+          grep -n "NEW BUILD" src/main/java/com/automation/tracker/ApplicationTrackerFrmExcel.java || true
 
-          echo "Searching for NEW BUILD statement:"
-          grep -Rn "NEW BUILD - TEST 001 - NOVEMBER 28" . --include="*.java" || true
+          echo "CHECKING SOURCE FILES:"
+          git status --short
 
-      # EXISTING EXECUTION STEP
+      # EXISTING MAVEN EXECUTION
       - name: Run Data Driven Selenium Framework Execution
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
