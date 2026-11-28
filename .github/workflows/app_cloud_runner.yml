@@ -1,12 +1,14 @@
+
 name: Application Cloud Automation Engine
 
 on:
-  workflow_dispatch: # Keeps manual buttons active
-  repository_dispatch: # Unlocks external API webhooks triggering capabilities
+  workflow_dispatch:
+  repository_dispatch:
 
 jobs:
   execute-selenium-suite:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code Repository Content
         uses: actions/checkout@v4
@@ -23,9 +25,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
+      # NEW DIAGNOSTIC STEP
+      - name: Verify latest Java source
+        run: |
+          echo "Latest commit:"
+          git log -1 --oneline
+
+          echo "Checking Java source:"
+          grep -n "NEW BUILD - TEST 001 - NOVEMBER 28" src/main/java/com/automation/tracker/ApplicationTrackerFrmExcel.java
+
+      # EXISTING EXECUTION STEP
       - name: Run Data Driven Selenium Framework Execution
         env:
-          # Securely passes your encrypted secret keys directly to the Java System
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: mvn -B clean compile exec:java -Dexec.mainClass="com.automation.tracker.ApplicationTrackerFrmExcel"
