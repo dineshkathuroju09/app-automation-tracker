@@ -39,7 +39,6 @@ public class ApplicationTrackerFrmExcel {
     }
 
     public static void main(String[] args) {
-    	System.out.println("NEW BUILD - TEST 001 - NOVEMBER 28");
         System.out.println("[*] Initialising Excel-Driven Automation Scraper...");
 
             // Step A: Dynamically read requirements directly from the spreadsheet file (Runs once per execution)
@@ -135,7 +134,8 @@ public class ApplicationTrackerFrmExcel {
         try {
             driver.get(target.webpageUrl);
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(12));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+            Thread.sleep(6000);
 
             // CRITICAL FIX: The XPATH is no longer hardcoded! It reads straight from the current row
             By dynamicLocator = By.xpath(target.targetXpath);
@@ -169,6 +169,17 @@ public class ApplicationTrackerFrmExcel {
         
             
          catch (Exception e) {
+        	 System.out.println("[DEBUG] Browser title: " + driver.getTitle());
+        	 System.out.println("[DEBUG] Browser URL: " + driver.getCurrentUrl());
+
+        	 String source = driver.getPageSource();
+
+        	 System.out.println("[DEBUG] Page source length: " + source.length());
+        	 System.out.println("[DEBUG] Page source preview:");
+
+        	 System.out.println(
+        	     source.substring(0, Math.min(source.length(), 1500))
+        	 );
             System.err.println("[-] Script Timeout / Element missing on: " + target.pageLabel +  " using xpath: " + target.targetXpath);
         } finally {
             driver.quit();
