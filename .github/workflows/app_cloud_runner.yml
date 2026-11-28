@@ -26,13 +26,16 @@ jobs:
           sudo apt-get install -y google-chrome-stable
 
       # NEW DIAGNOSTIC STEP
-      - name: Verify latest Java source
+      - name: Locate Java source files
         run: |
           echo "Latest commit:"
           git log -1 --oneline
 
-          echo "Checking Java source:"
-          grep -n "NEW BUILD - TEST 001 - NOVEMBER 28" src/main/java/com/automation/tracker/ApplicationTrackerFrmExcel.java
+          echo "Searching for Java files:"
+          find . -name "*.java"
+
+          echo "Searching for NEW BUILD statement:"
+          grep -Rn "NEW BUILD - TEST 001 - NOVEMBER 28" . --include="*.java" || true
 
       # EXISTING EXECUTION STEP
       - name: Run Data Driven Selenium Framework Execution
