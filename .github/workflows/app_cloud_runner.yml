@@ -28,4 +28,4 @@ jobs:
           # Securely passes your encrypted secret keys directly to the Java System
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: mvn -B clean compile exec:java \-Dexec.mainClass="com.automation.tracker.ApplicationTrackerFrmExcel"
+        run: mvn -B clean compile exec:java -Dexec.mainClass="com.automation.tracker.ApplicationTrackerFrmExcel"
